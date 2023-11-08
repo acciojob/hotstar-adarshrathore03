@@ -48,8 +48,11 @@ public class WebSeriesService {
             webSeriesRepository.save(webSeries);
             return webSeries.getId();
         }
+        else{
+            return null;
+        }
 
-        return null;
+
     }
 
 }
