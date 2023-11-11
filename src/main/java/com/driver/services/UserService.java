@@ -51,7 +51,9 @@ public class UserService {
                 if(age>=webSeries.getAgeLimit()){
                     if(subscriptionType==SubscriptionType.BASIC && webSeries.getSubscriptionType() == subscriptionType)
                         cnt++;
-                    else if(subscriptionType==SubscriptionType.PRO && (webSeries.getSubscriptionType()==SubscriptionType.BASIC || webSeries.getSubscriptionType()==SubscriptionType.PRO))
+                    else if(subscriptionType==SubscriptionType.PRO &&
+                            (webSeries.getSubscriptionType()==SubscriptionType.BASIC ||
+                                    webSeries.getSubscriptionType()==SubscriptionType.PRO))
                         cnt++;
                     else if(subscriptionType==SubscriptionType.ELITE)
                         cnt++;
