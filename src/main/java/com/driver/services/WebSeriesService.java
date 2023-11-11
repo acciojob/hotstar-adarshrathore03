@@ -8,6 +8,7 @@ import com.driver.repository.WebSeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,28 +30,33 @@ public class WebSeriesService {
         if(webSeriesOptional.isPresent()){
             throw new Exception("Series is already present");
         }
-        Optional<ProductionHouse> productionHouseOptional = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId());
+        WebSeries webSeries = new WebSeries();
+        webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
+        webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
+        webSeries.setRating(webSeriesEntryDto.getRating());
+        webSeries.setSubscriptionType(webSeriesEntryDto.getSubscriptionType());
 
-        if(productionHouseOptional.isPresent()){
-            ProductionHouse productionHouse = productionHouseOptional.get();
-            double sum = (productionHouse.getRatings()*productionHouse.getWebSeriesList().size())+webSeriesEntryDto.getRating();
-            int size = productionHouse.getWebSeriesList().size()+1;
-            double rating = sum/size;
-            productionHouse.setRatings(rating);
-            WebSeries webSeries = new WebSeries();
-            webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
-            webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
-            webSeries.setRating(webSeriesEntryDto.getRating());
-            webSeries.setSubscriptionType(webSeriesEntryDto.getSubscriptionType());
 
-            productionHouse.getWebSeriesList().add(webSeries);
-            webSeries.setProductionHouse(productionHouse);
-            webSeriesRepository.save(webSeries);
+
+            ProductionHouse productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
+            if(productionHouse==null){
+                throw new Exception("Production house is not present");
+            }
+        webSeries.setProductionHouse(productionHouse);
+        List<WebSeries> webSeriesList = productionHouse.getWebSeriesList();
+        webSeriesList.add(webSeries);
+        double productionHouseRating = 0;
+        for(WebSeries webSeries1 : webSeriesList){
+            productionHouseRating += webSeries1.getRating();
+        }
+        productionHouseRating = productionHouseRating/(webSeriesList.size());
+        productionHouse.setRatings(productionHouseRating);
+        productionHouse.setWebSeriesList(webSeriesList);
+
+        webSeriesRepository.save(webSeries);
             return webSeries.getId();
-        }
-        else{
-            return null;
-        }
+
+
 
 
     }
